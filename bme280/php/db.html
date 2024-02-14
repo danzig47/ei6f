@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>jQueryのAjaxをPHPで使うやつ</title>
+</head>
+<body>
+
+  <h1>jQueryのAjaxをPHPで使うやつ</h1>
+
+  <div id="XMLHttpRequest"></div><!-- ステータスコード -->
+  <div id="textStatus"></div><!-- エラー情報 -->
+  <div id="errorThrown"></div><!-- 例外情報 -->
+
+  <div id="result"></div><!-- 返してきたデータを表示 -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+
+    const data = [];
+
+    //Ajax通信メソッド
+    //type : HTTP通信の種類(POSTとかGETとか)
+    //url  : リクエスト送信先のURL
+    //data : サーバに送信する値
+    $.ajax({
+      type: "GET",
+      url: "./db.php",
+      data: data,
+      cache: false,
+      //Ajax通信が成功した場合に呼び出されるメソッド
+      success: function(data, dataType){
+
+        const j = JSON.parse(data);
+        console.log(j[0]);
+
+        //出力する部分
+        $('#result').html(JSON.stringify(j[0]));
+      },
+      error: function(XMLHttpRequest, textStatus, errorThrown){
+        //Ajax通信が失敗した場合に呼び出されるメソッド
+        alert('Error : ' + errorThrown);
+        $("#XMLHttpRequest").html("XMLHttpRequest : " + XMLHttpRequest.status);
+        $("#textStatus").html("textStatus : " + textStatus);
+        $("#errorThrown").html("errorThrown : " + errorThrown);
+      }
+    });
+});
+
+</script>
+</body>
+</html>

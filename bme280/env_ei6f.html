@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja" manifest="appcache">
+<head>
+<meta charset="UTF-8">
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" type="text/css" href="css/highcharts.css">
+<title>ei6F環境情報</title>
+</head>
+<body>
+
+<h1 style="text-align:center; margin-bottom:0px">ei6F 環境情報</h1>
+<div style="text-align:center;">30秒間隔で自動更新</div>
+<div style="text-align:center;" id="jikoku"></div>
+<figure class="highcharts-figure">
+  <ul class="top-banner">
+    <li><div id="temperature" class="container"></div></li>
+    <li><div id="humidity" class="container"></div></li>
+    <li><div id="pressure" class="container"></div></li>
+    <li><div id="co2" class="container"></div></li>
+    <li><div id="lux" class="container"></div></li>
+    <li><div id="di" class="container"></div></li>
+  </ul>
+</figure>
+<script>
+  $(() =>{
+
+    $("#jikoku").text(nowtime());    
+
+    const temp_param = {
+      name : 'temperature',
+      name_j : 'Temp',
+      type : 'gauge',
+      text : '気温（℃）',
+      unit : '℃',
+      yaxis_min: 16,
+      yaxis_max: 36,
+      plotBands: [{
+        from: 16,
+        to: 18,
+        color: '#87CEFA' // lightskyblue
+      }, {
+        from: 18,
+        to: 28,
+        color: '#55BF3B' // green
+      }, {
+        from: 28,
+        to: 30,
+        color: '#DDDF0D' // yellow
+      }, {
+        from: 30,
+        to: 36,
+        color: '#DF5353' // red
+      }]
+    };
+
+    const humi_param = {
+      name : 'humidity',
+      name_j : 'Humidity',
+      type : 'gauge',
+      text : '湿度（％）',
+      unit : '％',
+      yaxis_min: 0,
+      yaxis_max: 100,
+      plotBands: [{
+        from: 0,
+        to: 40,
+        color: '#DDDF0D' // yellow
+      }, {
+        from: 40,
+        to: 70,
+        color: '#55BF3B' // green
+      }, {
+        from: 70,
+        to: 100,
+        color: '#DF5353' // red
+      }]
+    };
+    
+    const di_param = {
+      name : 'di',
+      name_j : 'DI',
+      type : 'gauge',
+      text : '不快指数',
+      unit : '',
+      yaxis_min: 40,
+      yaxis_max: 110,
+      plotBands: [{
+        from: 40,
+        to: 60,
+        color: '#87CEFA' // lightskyblue
+      }, {
+        from: 60,
+        to: 75,
+        color: '#55BF3B' // green
+      }, {
+        from: 75,
+        to: 80,
+        color: '#DDDF0D' // yellow
+      }, {
+        from: 80,
+        to: 110,
+        color: '#DF5353' // red
+      }]
+    };
+
+    const press_param = {
+      name : 'pressure',
+      name_j : 'Pressure',
+      type : 'gauge',
+      text : '気圧（hPa）',
+      unit : 'hPa',
+      yaxis_min: 950,
+      yaxis_max: 1030,
+      plotBands: [{
+        from: 900,
+        to: 1050,
+        color: '#55BF3B' // green
+      }, {
+        from: 1013,
+        to: 1013.5,
+        color: '#000000' // black
+      }]
+    };
+
+    const lux_param = {
+      name : 'lux',
+      name_j : 'Lux',
+      type : 'gauge',
+      text : '明るさ（lx）',
+      unit : 'lx',
+      yaxis_min: 0,
+      yaxis_max: 500,
+      plotBands: [{
+        from: 0,
+        to: 500,
+        color: '#55BF3B' // green
+      }]
+    };
+
+    const co2_param = {
+      name : 'co2',
+      name_j : 'CO2',
+      type : 'gauge',
+      text : 'CO2濃度（ppm）',
+      unit : 'ppm',
+      yaxis_min: 400,
+      yaxis_max: 2000,
+      plotBands: [{
+        from: 400,
+        to: 1000,
+        color: '#55BF3B' // green
+      }, {
+        from: 1000,
+        to: 1500,
+        color: '#DDDF0D' // yellow
+      }, {
+        from: 1500,
+        to: 2000,
+        color: '#DF5353' // red
+      }]
+    };
+
+    gauge(temp_param);
+    gauge(humi_param);
+    gauge(press_param);
+    gauge(co2_param);
+    gauge(di_param);
+    gauge(lux_param);
+  });
+</script>
+
+<script>
+function gauge(param) {
+
+  Highcharts.chart(param.name, {
+
+  chart: {
+    type: param.type,
+    plotBackgroundColor: null,
+    plotBackgroundImage: null,
+    plotBorderWidth: 0,
+    plotShadow: false
+  },
+
+  title: {
+    text: param.text
+  },
+
+  pane: {
+    startAngle: -120,
+    endAngle: 120,
+    background: [{
+      backgroundColor: {
+        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+        stops: [
+          [0, '#FFF'],
+          [1, '#333']
+        ]
+      },
+      borderWidth: 0,
+      outerRadius: '109%'
+    }, {
+      backgroundColor: {
+        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+        stops: [
+          [0, '#333'],
+          [1, '#FFF']
+        ]
+      },
+      borderWidth: 1,
+      outerRadius: '107%'
+    }, {
+      // default background
+    }, {
+      backgroundColor: '#DDD',
+      borderWidth: 0,
+      outerRadius: '105%',
+      innerRadius: '103%'
+    }]
+  },
+
+  // the value axis
+  yAxis: {
+    min: param.yaxis_min,
+    max: param.yaxis_max,
+
+    minorTickInterval: 'auto',
+    minorTickWidth: 1,
+    minorTickLength: 10,
+    minorTickPosition: 'inside',
+    minorTickColor: '#666',
+
+    tickPixelInterval: 30,
+    tickWidth: 2,
+    tickPosition: 'inside',
+    tickLength: 10,
+    tickColor: '#666',
+    labels: {
+      step: 2,
+      rotation: 'auto'
+    },
+    title: {
+      text: param.unit,
+      style: {"fontSize": "18px"}
+    },
+    plotBands: param.plotBands
+  },
+
+  series: [{
+    name: param.text,
+    data: [0],
+    tooltip: {
+      valueSuffix: param.unit
+    }
+  }]
+
+},
+
+// Add some life
+function (chart) {
+  update(chart,param.name_j);
+});
+}
+
+</script>
+
+<script>
+function update(chart, param) {
+  let temp=0;
+  let co2=0;
+  if (!chart.renderer.forExport) {
+    setInterval( ()=> {
+        $("#jikoku").text(nowtime());    
+    
+        $.ajax({
+            url: './bme280.json',
+            method: 'GET',
+            dataType: 'json',
+            cache: false,
+          })
+          .done(function(response) {
+            temp = response[param];
+          })
+          .fail(function(xhr) {
+            console.log("fail");
+          })
+          .always(function(xhr, msg) { 
+        });
+        $.ajax({
+            url: './co2.json',
+            method: 'GET',
+            dataType: 'json',
+            cache: false,
+          })
+          .done(function(response) {
+            co2 = response.CO2;
+          })
+          .fail(function(xhr) {
+            console.log("fail");
+          })
+          .always(function(xhr, msg) { 
+        });
+        let point = chart.series[0].points[0];
+        if (param == 'CO2') {
+          point.update(parseFloat(co2));
+        } else {
+          point.update(parseFloat(temp));
+        }
+    }, 2000);
+  }
+}
+</script>
+<script>
+let nowtime = () => {
+  let now = new Date();
+  let year = now.getFullYear();
+  let month = now.getMonth() + 1;
+  let datet = now.getDate();
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+
+  let jikoku = year + '年' + month + '月' + datet + '日' + hours + '時' + minutes + '分';
+
+  return jikoku
+}
+</script>
+</body>
+</html>
